@@ -196,6 +196,7 @@ class Contact {
     this.androidAccountType,
     this.androidAccountTypeRaw,
     this.androidAccountName,
+    this.notes,
   });
 
   String? identifier,
@@ -206,7 +207,8 @@ class Contact {
       suffix,
       familyName,
       company,
-      jobTitle;
+      jobTitle,
+      notes;
   String? androidAccountTypeRaw, androidAccountName;
   AndroidAccountType? androidAccountType;
   List<Item>? emails = [];
@@ -231,6 +233,7 @@ class Contact {
     suffix = m["suffix"];
     company = m["company"];
     jobTitle = m["jobTitle"];
+    notes = m["note"];
     androidAccountTypeRaw = m["androidAccountType"];
     androidAccountType = accountTypeFromString(androidAccountTypeRaw);
     androidAccountName = m["androidAccountName"];
@@ -281,7 +284,8 @@ class Contact {
       "phones": phones,
       "postalAddresses": postalAddresses,
       "avatar": contact.avatar,
-      "birthday": birthday
+      "birthday": birthday,
+      "note": contact.notes,
     };
   }
 
@@ -323,6 +327,7 @@ class Contact {
                 .toList(),
         avatar: this.avatar ?? other.avatar,
         birthday: this.birthday ?? other.birthday,
+        notes: this.notes ?? other.notes,
       );
 
   /// Returns true if all items in this contact are identical.

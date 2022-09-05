@@ -368,7 +368,8 @@ public class SwiftContactsServicePlugin: NSObject, FlutterPlugin, CNContactViewC
                     CNContactPostalAddressesKey,
                     CNContactOrganizationNameKey,
                     CNContactImageDataKey,
-                    CNContactJobTitleKey] as [Any]
+                    CNContactJobTitleKey,
+                    CNContactBirthdayKey] as [Any]
         do {
             // Check if the contact exists
             if let contact = try store.unifiedContact(withIdentifier: identifier, keysToFetch: keys as! [CNKeyDescriptor]).mutableCopy() as? CNMutableContact{
@@ -417,6 +418,14 @@ public class SwiftContactsServicePlugin: NSObject, FlutterPlugin, CNContactViewC
                         updatedPostalAddresses.append(CNLabeledValue(label: getCommonLabel(label: label), value: newAddress))
                     }
                     contact.postalAddresses = updatedPostalAddresses
+                }
+
+                //BIRTHDAY
+                if let birthday = dictionary["birthday"] as? String {
+                    let formatter = DateFormatter()
+                    formatter.dateFormat = "yyyy-MM-dd"
+                    let date = formatter.date(from: birthday)!
+                    contact.birthday = Calendar.current.dateComponents([.year, .month, .day], from: date)
                 }
 
                 // Attempt to update the contact

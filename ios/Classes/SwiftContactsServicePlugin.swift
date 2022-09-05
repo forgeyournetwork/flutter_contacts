@@ -573,6 +573,10 @@ public class SwiftContactsServicePlugin: NSObject, FlutterPlugin, CNContactViewC
             result["birthday"] = formatter.string(from: birthday)
         }
 
+        result["birthdayDay"] = contact.birthday?.day
+        result["birthdayMonth"] = contact.birthday?.month
+        result["birthdayYear"] = contact.birthday?.year
+
         return result
     }
 

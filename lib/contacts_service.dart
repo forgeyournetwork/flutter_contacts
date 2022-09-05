@@ -193,6 +193,9 @@ class Contact {
     this.postalAddresses,
     this.avatar,
     this.birthday,
+    this.birthdayDay,
+    this.birthdayMonth,
+    this.birthdayYear,
     this.androidAccountType,
     this.androidAccountTypeRaw,
     this.androidAccountName,
@@ -214,6 +217,9 @@ class Contact {
   List<PostalAddress>? postalAddresses = [];
   Uint8List? avatar;
   DateTime? birthday;
+  int? birthdayDay;
+  int? birthdayMonth;
+  int? birthdayYear;
 
   String initials() {
     return ((this.givenName?.isNotEmpty == true ? this.givenName![0] : "") +
@@ -245,6 +251,9 @@ class Contact {
     } catch (e) {
       birthday = null;
     }
+    birthdayDay = m["birthdayDay"];
+    birthdayMonth = m["birthdayMonth"];
+    birthdayYear = m["birthdayYear"];
   }
 
   static Map _toMap(Contact contact) {
@@ -281,7 +290,10 @@ class Contact {
       "phones": phones,
       "postalAddresses": postalAddresses,
       "avatar": contact.avatar,
-      "birthday": birthday
+      "birthday": birthday,
+      "birthdayDay": contact.birthdayDay,
+      "birthdayMonth": contact.birthdayMonth,
+      "birthdayYear": contact.birthdayYear,
     };
   }
 

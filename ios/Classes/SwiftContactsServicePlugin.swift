@@ -59,12 +59,13 @@ public class SwiftContactsServicePlugin: NSObject, FlutterPlugin, CNContactViewC
             let contact = dictionaryToContact(dictionary: call.arguments as! [String : Any])
 
             let addResult = addContact(contact: contact)
-            if (addResult == "") {
-                result(nil)
-            }
-            else {
-                result(FlutterError(code: "", message: addResult, details: nil))
-            }
+            result(addResult)
+            // if (addResult == "") {
+            //     result(nil)
+            // }
+            // else {
+            //     result(FlutterError(code: "", message: addResult, details: nil))
+            // }
         case "deleteContact":
             if(deleteContact(dictionary: call.arguments as! [String : Any])){
                 result(nil)
@@ -205,6 +206,9 @@ public class SwiftContactsServicePlugin: NSObject, FlutterPlugin, CNContactViewC
             let saveRequest = CNSaveRequest()
             saveRequest.add(contact, toContainerWithIdentifier: nil)
             try store.execute(saveRequest)
+            if contact.isKeyAvailable(CNContactIdentifierKey) {
+                return contact.identifier
+            }
         }
         catch {
             return error.localizedDescription

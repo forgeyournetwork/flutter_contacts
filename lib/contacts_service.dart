@@ -196,6 +196,7 @@ class Contact {
     this.birthdayDay,
     this.birthdayMonth,
     this.birthdayYear,
+    this.notes,
     this.androidAccountType,
     this.androidAccountTypeRaw,
     this.androidAccountName,
@@ -209,7 +210,8 @@ class Contact {
       suffix,
       familyName,
       company,
-      jobTitle;
+      jobTitle,
+      notes;
   String? androidAccountTypeRaw, androidAccountName;
   AndroidAccountType? androidAccountType;
   List<Item>? emails = [];
@@ -254,6 +256,7 @@ class Contact {
     birthdayDay = m["birthdayDay"];
     birthdayMonth = m["birthdayMonth"];
     birthdayYear = m["birthdayYear"];
+    notes = m["note"];
   }
 
   static Map _toMap(Contact contact) {
@@ -294,6 +297,7 @@ class Contact {
       "birthdayDay": contact.birthdayDay,
       "birthdayMonth": contact.birthdayMonth,
       "birthdayYear": contact.birthdayYear,
+      "note": contact.notes,
     };
   }
 
@@ -335,6 +339,10 @@ class Contact {
                 .toList(),
         avatar: this.avatar ?? other.avatar,
         birthday: this.birthday ?? other.birthday,
+        birthdayDay: this.birthdayDay ?? other.birthdayDay,
+        birthdayMonth: this.birthdayMonth ?? other.birthdayMonth,
+        birthdayYear: this.birthdayYear ?? other.birthdayYear,
+        notes: this.notes ?? other.notes,
       );
 
   /// Returns true if all items in this contact are identical.
@@ -354,6 +362,10 @@ class Contact {
         this.prefix == other.prefix &&
         this.suffix == other.suffix &&
         this.birthday == other.birthday &&
+        this.birthdayDay == other.birthdayDay &&
+        this.birthdayMonth == other.birthdayMonth &&
+        this.birthdayYear == other.birthdayYear &&
+        this.notes == other.notes &&
         DeepCollectionEquality.unordered().equals(this.phones, other.phones) &&
         DeepCollectionEquality.unordered().equals(this.emails, other.emails) &&
         DeepCollectionEquality.unordered()
@@ -375,6 +387,10 @@ class Contact {
       this.prefix,
       this.suffix,
       this.birthday,
+      this.birthdayDay,
+      this.birthdayMonth,
+      this.birthdayYear,
+      this.notes,
     ].where((s) => s != null));
   }
 

@@ -110,6 +110,9 @@ public class ContactsServicePlugin implements MethodCallHandler, FlutterPlugin, 
       } case "getContactsForEmail": {
         this.getContactsForEmail(call.method, (String)call.argument("email"), (boolean)call.argument("withThumbnails"), (boolean)call.argument("photoHighResolution"), (boolean)call.argument("orderByGivenName"), (boolean)call.argument("androidLocalizedLabels"), result);
         break;
+      } case "getContactById": {
+        this.getContactById(call.method, (String)call.argument("identifier"), (boolean)call.argument("withThumbnails"), (boolean)call.argument("photoHighResolution"), (boolean)call.argument("androidLocalizedLabels"), result);
+        break;
       } case "getAvatar": {
         final Contact contact = Contact.fromMap((HashMap)call.argument("contact"));
         this.getAvatar(contact, (boolean)call.argument("photoHighResolution"), result);
@@ -217,6 +220,10 @@ public class ContactsServicePlugin implements MethodCallHandler, FlutterPlugin, 
 
   private void getContactsForEmail(String callMethod, String email, boolean withThumbnails, boolean photoHighResolution, boolean orderByGivenName, boolean localizedLabels, Result result) {
     new GetContactsTask(callMethod, result, withThumbnails, photoHighResolution, orderByGivenName, localizedLabels).executeOnExecutor(executor, email, true);
+  }
+
+  private void getContactById(String callMethod, String identifier, boolean withThumbnails, boolean photoHighResolution, boolean localizedLabels, Result result) {
+    new GetContactByIdTask(result, withThumbnails, photoHighResolution, localizedLabels).executeOnExecutor(executor, identifier);
   }
 
   @Override
@@ -494,6 +501,55 @@ public class ContactsServicePlugin implements MethodCallHandler, FlutterPlugin, 
     protected void onPostExecute(ArrayList<HashMap> result) {
       if (result == null) {
         getContactResult.notImplemented();
+      } else {
+        getContactResult.success(result);
+      }
+    }
+  }
+
+  @TargetApi(Build.VERSION_CODES.CUPCAKE)
+  private class GetContactByIdTask extends AsyncTask<String, Void, HashMap> {
+
+    private Result getContactResult;
+    private boolean withThumbnails;
+    private boolean photoHighResolution;
+    private boolean localizedLabels;
+
+    public GetContactByIdTask(Result result, boolean withThumbnails, boolean photoHighResolution, boolean localizedLabels) {
+      this.getContactResult = result;
+      this.withThumbnails = withThumbnails;
+      this.photoHighResolution = photoHighResolution;
+      this.localizedLabels = localizedLabels;
+    }
+
+    @TargetApi(Build.VERSION_CODES.ECLAIR)
+    protected HashMap doInBackground(String... params) {
+      String identifier = params[0];
+      ArrayList<Contact> contacts = getContactsFrom(getCursor(null, identifier), localizedLabels);
+      
+      if (contacts.isEmpty()) {
+        return null;
+      }
+      
+      Contact contact = contacts.get(0);
+      
+      if (withThumbnails) {
+        final byte[] avatar = loadContactPhotoHighRes(
+                contact.identifier, photoHighResolution, contentResolver);
+        if (avatar != null) {
+          contact.avatar = avatar;
+        } else {
+          // To stay backwards-compatible, return an empty byte array rather than `null`.
+          contact.avatar = new byte[0];
+        }
+      }
+      
+      return contact.toMap();
+    }
+
+    protected void onPostExecute(HashMap result) {
+      if (result == null) {
+        getContactResult.success(null);
       } else {
         getContactResult.success(result);
       }

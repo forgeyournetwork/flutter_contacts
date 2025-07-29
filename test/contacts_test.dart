@@ -29,6 +29,18 @@ void main() {
             'birthday': '1994-02-01'
           },
         ];
+      case 'getContactById':
+        return {
+          'identifier': 'test-id',
+          'givenName': 'John',
+          'familyName': 'Doe',
+          'emails': [
+            {'label': 'work', 'value': 'john@example.com'}
+          ],
+          'phones': [
+            {'label': 'mobile', 'value': '1234567890'}
+          ]
+        };
       case 'getAvatar':
         return Uint8List.fromList([0, 1, 2, 3]);
       default:
@@ -93,6 +105,29 @@ void main() {
       expect(contacts.length, equals(2));
       expect(contacts[0].givenName, 'givenName1');
       expect(contacts[1].givenName, 'givenName2');
+    });
+  });
+
+  group('ContactsService.getContactById', () {
+    test('returns null when identifier is null or empty', () async {
+      final contact1 = await ContactsService.getContactById(null);
+      final contact2 = await ContactsService.getContactById('');
+      expect(contact1, isNull);
+      expect(contact2, isNull);
+    });
+
+    test('returns contact when valid identifier is supplied', () async {
+      final contact = await ContactsService.getContactById('test-id');
+      expect(contact, isNotNull);
+      expect(contact!.identifier, 'test-id');
+      expect(contact.givenName, 'John');
+      expect(contact.familyName, 'Doe');
+      expect(contact.emails!.length, 1);
+      expect(contact.emails![0].label, 'work');
+      expect(contact.emails![0].value, 'john@example.com');
+      expect(contact.phones!.length, 1);
+      expect(contact.phones![0].label, 'mobile');
+      expect(contact.phones![0].value, '1234567890');
     });
   });
 

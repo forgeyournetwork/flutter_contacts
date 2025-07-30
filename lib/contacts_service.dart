@@ -75,6 +75,27 @@ class ContactsService {
     return contacts.map((m) => Contact.fromMap(m)).toList();
   }
 
+  /// Fetches a single contact by its identifier
+  static Future<Contact?> getContactById(String identifier,
+      {bool withThumbnails = true,
+      bool photoHighResolution = true,
+      bool iOSLocalizedLabels = true,
+      bool androidLocalizedLabels = true}) async {
+    if (identifier == null || identifier.isEmpty) return null;
+
+    dynamic result =
+        await _channel.invokeMethod('getContactById', <String, dynamic>{
+      'identifier': identifier,
+      'withThumbnails': withThumbnails,
+      'photoHighResolution': photoHighResolution,
+      'iOSLocalizedLabels': iOSLocalizedLabels,
+      'androidLocalizedLabels': androidLocalizedLabels,
+    });
+
+    if (result == null) return null;
+    return Contact.fromMap(result);
+  }
+
   /// Loads the avatar for the given contact and returns it. If the user does
   /// not have an avatar, then `null` is returned in that slot. Only implemented
   /// on Android.

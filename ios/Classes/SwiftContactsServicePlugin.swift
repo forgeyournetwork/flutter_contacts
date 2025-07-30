@@ -55,6 +55,16 @@ public class SwiftContactsServicePlugin: NSObject, FlutterPlugin, CNContactViewC
                     localizedLabels: arguments["iOSLocalizedLabels"] as! Bool
                 )
             )
+        case "getContactById":
+            let arguments = call.arguments as! [String:Any]
+            result(
+                getContactById(
+                    identifier: (arguments["identifier"] as? String),
+                    withThumbnails: arguments["withThumbnails"] as! Bool,
+                    photoHighResolution: arguments["photoHighResolution"] as! Bool,
+                    localizedLabels: arguments["iOSLocalizedLabels"] as! Bool
+                )
+            )
         case "addContact":
             let contact = dictionaryToContact(dictionary: call.arguments as! [String : Any])
 
@@ -182,6 +192,43 @@ public class SwiftContactsServicePlugin: NSObject, FlutterPlugin, CNContactViewC
         }
 
         return result
+    }
+
+    func getContactById(identifier: String?, withThumbnails: Bool, photoHighResolution: Bool, localizedLabels: Bool) -> [String:Any]? {
+        guard let identifier = identifier, !identifier.isEmpty else {
+            return nil
+        }
+
+        let store = CNContactStore()
+        var keys = [CNContactFormatter.descriptorForRequiredKeys(for: .fullName),
+                    CNContactEmailAddressesKey,
+                    CNContactPhoneNumbersKey,
+                    CNContactFamilyNameKey,
+                    CNContactGivenNameKey,
+                    CNContactMiddleNameKey,
+                    CNContactNamePrefixKey,
+                    CNContactNameSuffixKey,
+                    CNContactPostalAddressesKey,
+                    CNContactOrganizationNameKey,
+                    CNContactJobTitleKey,
+                    CNContactBirthdayKey,
+                    CNContactNoteKey] as [Any]
+
+        if(withThumbnails){
+            if(photoHighResolution){
+                keys.append(CNContactImageDataKey)
+            } else {
+                keys.append(CNContactThumbnailImageDataKey)
+            }
+        }
+
+        do {
+            let contact = try store.unifiedContact(withIdentifier: identifier, keysToFetch: keys as! [CNKeyDescriptor])
+            return contactToDictionary(contact: contact, localizedLabels: localizedLabels)
+        } catch {
+            print("Error fetching contact by ID: \(error.localizedDescription)")
+            return nil
+        }
     }
 
     private func has(contact: CNContact, phone: String) -> Bool {

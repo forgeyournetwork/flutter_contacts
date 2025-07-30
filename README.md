@@ -54,6 +54,9 @@ Uint8List avatar = await ContactsService.getAvatar(contact);
 // Get contacts matching a string
 List<Contact> johns = await ContactsService.getContacts(query : "john");
 
+// Get a single contact by identifier
+Contact? contact = await ContactsService.getContactById("contact_identifier");
+
 // Add a contact  
 // The contact must have a firstName / lastName to be successfully added  
 await ContactsService.addContact(newContact);  

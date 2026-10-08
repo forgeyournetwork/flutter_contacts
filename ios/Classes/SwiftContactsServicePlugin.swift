@@ -7,20 +7,24 @@ import ContactsUI
 public class SwiftContactsServicePlugin: NSObject, FlutterPlugin, CNContactViewControllerDelegate, CNContactPickerDelegate {
     private var result: FlutterResult? = nil
     private var localizedLabels: Bool = true
-    private let rootViewController: UIViewController
+    /// Resolved when needed, not at registration: with the UIScene lifecycle the plugin
+    /// registers while the root FlutterViewController is still being created, so there is
+    /// no window yet.
+    private var rootViewController: UIViewController? {
+        UIApplication.shared.delegate?.window??.rootViewController
+            ?? UIApplication.shared.keyWindow?.rootViewController
+    }
     static let FORM_OPERATION_CANCELED: Int = 1
     static let FORM_COULD_NOT_BE_OPEN: Int = 2
     
     public static func register(with registrar: FlutterPluginRegistrar) {
         let channel = FlutterMethodChannel(name: "github.com/clovisnicolas/flutter_contacts", binaryMessenger: registrar.messenger())
-        let rootViewController = UIApplication.shared.delegate!.window!!.rootViewController!;
-        let instance = SwiftContactsServicePlugin(rootViewController)
+        let instance = SwiftContactsServicePlugin()
         registrar.addMethodCallDelegate(instance, channel: channel)
         instance.preLoadContactView()
     }
 
-    init(_ rootViewController: UIViewController) {
-        self.rootViewController = rootViewController
+    override init() {
     }
 
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
@@ -361,7 +365,7 @@ public class SwiftContactsServicePlugin: NSObject, FlutterPlugin, CNContactViewC
         contactPicker.delegate = self
         //contactPicker!.displayedPropertyKeys = [CNContactPhoneNumbersKey];
         DispatchQueue.main.async {
-            self.rootViewController.present(contactPicker, animated: true, completion: nil)
+            self.rootViewController?.present(contactPicker, animated: true, completion: nil)
         }
     }
 
